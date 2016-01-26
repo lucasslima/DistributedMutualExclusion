@@ -33,6 +33,7 @@ public class Philosopher extends Server{
 	private SocketConsumer<Socket> mConsumer;
 	private Timestamp mTime;
 	private Queue<Integer> fifo;
+	private static int ackCount;
 	/**
 	 * @param args
 	 */
@@ -44,6 +45,7 @@ public class Philosopher extends Server{
 	public Philosopher(int id, int port){
 		super(port);
 		feedCount = 0;
+		ackCount = 0;
 		this.id = id;
 		fifo = new LinkedBlockingQueue<Integer>();
 		try{
@@ -51,9 +53,24 @@ public class Philosopher extends Server{
 			GenericResource<Socket> re = new GenericResource<>();
 			re.putRegister(s);
 			mConsumer = new SocketConsumer<>(re);
-			while (true){
-				Thread.sleep( (long) Math.random() % 1000);
+			Thread listeningThread = new Thread(new Runnable() {
 				
+				@Override
+				public void run() {
+					listen();
+				}
+			});
+			listeningThread.run();
+			while (true){
+				mState = State.THINKING;
+				Thread.sleep( (long) Math.random() % 1000);
+				mState = State.HUNGRY;
+				sendMessage(PhilosopherMessage.REQUEST, id);
+				//TODO Wait for ACTs from left and right
+				eat();
+				while(!fifo.isEmpty()){
+					sendMessage(PhilosopherMessage.ACK, fifo.poll());
+				}
 			}
 		}catch(Exception e){
 			e.printStackTrace();
@@ -76,8 +93,12 @@ public class Philosopher extends Server{
             	  PhilosopherMessage message = (PhilosopherMessage) ois.readObject();
             	  switch (message.getType()) {
 				case PhilosopherMessage.ACK:
-					
-					break;
+					ackCount++;
+					if (ackCount == 2){
+						mState = State.EATING;
+						ackCount = 0;
+					}
+					break; 
 				case PhilosopherMessage.REQUEST:
 					if (mState == State.HUNGRY){
 						if (mTime.getTime() <= message.getTimestamp().getTime()){
@@ -109,6 +130,9 @@ public class Philosopher extends Server{
 		
 	}
 	private void sendMessage(int type,int id){
+		
+	}
+	private void eat(){
 		
 	}
 }
