@@ -7,7 +7,7 @@ import java.net.Socket;
 
 import server.GenericConsumer;
 import server.GenericResource;
-import server.JCL_message;
+import server.Message;
 
 // exemplo de um consumidor !!!
 
@@ -23,7 +23,7 @@ public class SocketConsumer<S extends Socket> extends GenericConsumer<S>{
 			// TODO Auto-generated method stub
 			ObjectInputStream in = new ObjectInputStream(str.getInputStream());
 			
-			JCL_message msg = (JCL_message) in.readObject();
+			Message msg = (Message) in.readObject();
 			System.err.println("Server: " + msg.getType());
 			switch (msg.getType()){
 				

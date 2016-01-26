@@ -36,29 +36,29 @@ public abstract class Server {
 		}
 	}
 	
-	protected void listen(){
-		openServerSocket();
-		 		
-        while(! serverR.isStopped()){
-            
-            try {
-            	Socket clientSocket = this.serverSocket.accept();
-                serverR.putRegister(clientSocket);
-            } catch (IOException e) {
-                if(serverR.isStopped()) {
-                    System.out.println("Server Stopped.") ;
-                    return;
-                }
-                throw new RuntimeException(
-                    "Error accepting client connection", e);
-            } 
-            
-            
-        }
-        System.out.println("Server Stopped.") ;
-	}	
+	protected abstract void listen();//{
+//		openServerSocket();
+//		 		
+//        while(! serverR.isStopped()){
+//            
+//            try {
+//            	Socket clientSocket = this.serverSocket.accept();
+//                serverR.putRegister(clientSocket);
+//            } catch (IOException e) {
+//                if(serverR.isStopped()) {
+//                    System.out.println("Server Stopped.") ;
+//                    return;
+//                }
+//                throw new RuntimeException(
+//                    "Error accepting client connection", e);
+//            } 
+//            
+//            
+//        }
+//        System.out.println("Server Stopped.") ;
+//	}	
     
-    private void openServerSocket() {
+    protected void openServerSocket() {
         try {
             this.serverSocket = new ServerSocket(this.port);
         } catch (IOException e) {
