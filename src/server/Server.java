@@ -17,9 +17,6 @@ public abstract class Server {
 	public Server(int port){
 		this.initialTime = System.nanoTime();		
 		this.port = port;
-		numOfThreads = CoresAutodetect.detect();
-		serverThreads = new GenericConsumer[numOfThreads];
-		serverR = new GenericResource<Socket>();		
 	}
 	
 	public void begin(){
@@ -36,27 +33,7 @@ public abstract class Server {
 		}
 	}
 	
-	protected abstract void listen();//{
-//		openServerSocket();
-//		 		
-//        while(! serverR.isStopped()){
-//            
-//            try {
-//            	Socket clientSocket = this.serverSocket.accept();
-//                serverR.putRegister(clientSocket);
-//            } catch (IOException e) {
-//                if(serverR.isStopped()) {
-//                    System.out.println("Server Stopped.") ;
-//                    return;
-//                }
-//                throw new RuntimeException(
-//                    "Error accepting client connection", e);
-//            } 
-//            
-//            
-//        }
-//        System.out.println("Server Stopped.") ;
-//	}	
+	protected abstract void listen();
     
     protected void openServerSocket() {
         try {

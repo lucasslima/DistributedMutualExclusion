@@ -65,6 +65,8 @@ public class Philosopher extends Server{
 				mState = State.THINKING;
 				Thread.sleep( (long) Math.random() % 1000);
 				mState = State.HUNGRY;
+				//TODO Send request for left and right
+				sendMessage(PhilosopherMessage.REQUEST, id);
 				sendMessage(PhilosopherMessage.REQUEST, id);
 				//TODO Wait for ACTs from left and right
 				eat();
@@ -73,6 +75,7 @@ public class Philosopher extends Server{
 				}
 			}
 		}catch(Exception e){
+			//TODO Handle no philosopher on left or right
 			e.printStackTrace();
 		}
 	}
@@ -97,6 +100,7 @@ public class Philosopher extends Server{
 					if (ackCount == 2){
 						mState = State.EATING;
 						ackCount = 0;
+						//TODO Wake main thread
 					}
 					break; 
 				case PhilosopherMessage.REQUEST:
