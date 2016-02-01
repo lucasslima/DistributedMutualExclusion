@@ -1,22 +1,15 @@
 package appl;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.Queue;
-import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
 
 import server.GenericConsumer;
 import server.GenericResource;
-import server.Message;
 import server.PhilosopherMessage;
 import server.Server;
 
@@ -34,11 +27,19 @@ public class Philosopher extends Server{
 	private Timestamp mTime;
 	private Queue<Integer> fifo;
 	private static int ackCount;
+	private static IpSender sender;
 	/**
 	 * @param args
+	 * @throws IOException 
+	 * @throws UnknownHostException 
+	 * @throws ClassNotFoundException 
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
+		String ipServer = "type ip here";
+		
+		sender = new IpSender(ipServer);
+		sender.sendIP();
+		
 		new Philosopher(Integer.parseInt(args[1]),Integer.parseInt(args[2]));
 	}
 	
