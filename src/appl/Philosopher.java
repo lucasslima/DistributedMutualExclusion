@@ -1,10 +1,15 @@
 package appl;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -28,18 +33,16 @@ public class Philosopher extends Server{
 	private Queue<Integer> fifo;
 	private static int ackCount;
 	private static IpSender sender;
+	private static ArrayList<String> neighboors; 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 * @throws UnknownHostException 
 	 * @throws ClassNotFoundException 
 	 */
-	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
-		String ipServer = "type ip here";
-		
-		sender = new IpSender(ipServer);
-		sender.sendIP();
-		
+	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {	
+		getNeighboors();
+
 		new Philosopher(Integer.parseInt(args[1]),Integer.parseInt(args[2]));
 	}
 	
@@ -134,6 +137,20 @@ public class Philosopher extends Server{
       System.out.println("Server Stopped.") ;
 		
 	}
+	
+	private static void getNeighboors() throws IOException{
+		File file = new File("neighboors.txt");
+		
+		FileReader fileReader = new FileReader(file);
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+		
+		String line = null; 
+		
+		while((line = bufferedReader.readLine()) != null)
+			neighboors.add(line);
+	}
+	
+	
 	private void sendMessage(int type,int id){
 		
 	}
