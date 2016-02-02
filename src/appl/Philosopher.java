@@ -56,11 +56,7 @@ public class Philosopher {
 
 	public Philosopher(String id, int port) throws IOException {
 		serverSocket = new ServerSocket(port);
-		try{
-			Thread.sleep(5000);
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+		
 //		this.id = id;
 		fifo = new LinkedBlockingQueue<String>();
 
@@ -73,7 +69,11 @@ public class Philosopher {
 					listen();
 				}
 			}.start();
-
+			try{
+				Thread.sleep(5000);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 			while (true) {
 				mState = State.THINKING;
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
