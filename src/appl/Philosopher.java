@@ -143,6 +143,8 @@ public class Philosopher {
 								sendMessage(PhilosopherMessage.ACK, message.getId());
 							}
 						}
+						else
+							sendMessage(PhilosopherMessage.ACK,message.getId());
 						break;
 					default:
 						break;
