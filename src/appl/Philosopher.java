@@ -176,8 +176,10 @@ public class Philosopher {
 
 		PhilosopherMessage message = new PhilosopherMessage();
 		message.setType(type);
+		message.setId(ip);
 		if (type == PhilosopherMessage.REQUEST)
 			mTime = new Timestamp(System.currentTimeMillis());
+		
 		// Escreve o objeto a ser enviado e fecha a conexão
 		ObjectOutputStream out = new ObjectOutputStream(neighboor.getOutputStream());
 		out.writeObject(message);
