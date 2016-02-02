@@ -178,21 +178,26 @@ public class Philosopher {
 
 	private void sendMessage(int type, String ip) throws UnknownHostException, IOException {
 		// Cria uma nova conexão com o vizinho
-		Socket neighboor = new Socket(ip, port);
-
-		PhilosopherMessage message = new PhilosopherMessage();
-		message.setType(type);
-		message.setId(neighboor.getLocalAddress().getHostAddress());
-		if (type == PhilosopherMessage.REQUEST)
-			mTime = new Timestamp(System.currentTimeMillis());
-		
-		// Escreve o objeto a ser enviado e fecha a conexão
-		ObjectOutputStream out = new ObjectOutputStream(neighboor.getOutputStream());
-		out.writeObject(message);
-		out.flush();
-		out.close();
-
-		neighboor.close();
+		try{
+			Socket neighboor = new Socket(ip, port);
+	
+			PhilosopherMessage message = new PhilosopherMessage();
+			message.setType(type);
+			message.setId(neighboor.getLocalAddress().getHostAddress());
+			if (type == PhilosopherMessage.REQUEST)
+				mTime = new Timestamp(System.currentTimeMillis());
+			
+			// Escreve o objeto a ser enviado e fecha a conexão
+			ObjectOutputStream out = new ObjectOutputStream(neighboor.getOutputStream());
+			out.writeObject(message);
+			out.flush();
+			out.close();
+	
+			neighboor.close();
+		}
+		catch (Exception e){
+			ackCount++;
+		}
 	}
 
 	private void eat() throws UnknownHostException {
