@@ -79,6 +79,7 @@ public class Philosopher {
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
 				Thread.sleep((long) Math.random() % 1000);
 				mState = State.HUNGRY;
+				mTime = new Timestamp(System.currentTimeMillis());
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is hungry...!");
 				
 				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
@@ -121,7 +122,6 @@ public class Philosopher {
 						// Se dois acks(do filosofo da direita e da esquerda)
 						// são recebidos este filosofo pode comer
 						if (ackCount == 2) {
-							mState = State.EATING;
 							ackCount = 0;
 							// TODO Wake main thread
 						}
