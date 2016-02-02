@@ -94,9 +94,11 @@ public class Philosopher {
 				}
 				eat();
 
-				while (!fifo.isEmpty()) {
-					sendMessage(PhilosopherMessage.ACK, fifo.poll());
-				}
+//				while (!fifo.isEmpty()) {
+//					sendMessage(PhilosopherMessage.ACK, fifo.poll());
+//				}
+				sendMessage(PhilosopherMessage.ACK, neighboors.get(0));
+				sendMessage(PhilosopherMessage.ACK, neighboors.get(1));
 			}
 		} catch (Exception e) {
 			// TODO Handle no philosopher on left or right
