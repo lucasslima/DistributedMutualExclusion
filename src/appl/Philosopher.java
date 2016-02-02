@@ -86,8 +86,12 @@ public class Philosopher {
 				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
 				
 				//espera por dois acks 
-				while (ackCount < 2);
-				
+				//while (ackCount < 2);
+				if (ackCount < 2){
+					synchronized (this) {
+						this.wait();
+					}
+				}
 				eat();
 
 				while (!fifo.isEmpty()) {
@@ -118,11 +122,14 @@ public class Philosopher {
 					switch (message.getType()) {
 					// Ack significa que um release é recebido
 					case PhilosopherMessage.ACK:
-						ackCount++;
+						synchronized(this){
+							ackCount++;
+						}
 						// Se dois acks(do filosofo da direita e da esquerda)
 						// são recebidos este filosofo pode comer
 						if (ackCount == 2) {
 							// TODO Wake main thread
+							this.notify();
 						}
 						break;
 					// Request significa que algum filosofo está pedindo para
@@ -179,7 +186,7 @@ public class Philosopher {
 
 	private void sendMessage(int type, String ip) throws UnknownHostException, IOException {
 		// Cria uma nova conexão com o vizinho
-		System.out.print("Sending " + type + "to" + ip);
+		System.out.println("Sending " + type + " to " + ip);
 		try{
 			Socket neighboor = new Socket(ip, port);
 	
@@ -198,13 +205,17 @@ public class Philosopher {
 			neighboor.close();
 		}
 		catch (Exception e){
-			ackCount++;
+			synchronized (this) {
+				ackCount++;
+			}
 		}
 	}
 
 	private void eat() throws UnknownHostException {
 		mState = State.EATING;
 		System.out.println("IP: " + inetAddress.getHostAddress() + " is eating...!");
-		ackCount = 0;
+		synchronized (this) {
+			ackCount = 0;
+		}
 	}
 }
