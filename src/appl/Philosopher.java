@@ -122,7 +122,6 @@ public class Philosopher {
 						// Se dois acks(do filosofo da direita e da esquerda)
 						// são recebidos este filosofo pode comer
 						if (ackCount == 2) {
-							ackCount = 0;
 							// TODO Wake main thread
 						}
 						break;
@@ -144,7 +143,8 @@ public class Philosopher {
 							}
 						}
 						else
-							sendMessage(PhilosopherMessage.ACK,message.getId());
+							if (mState == State.THINKING)
+								sendMessage(PhilosopherMessage.ACK,message.getId());
 						break;
 					default:
 						break;
@@ -196,5 +196,6 @@ public class Philosopher {
 	private void eat() throws UnknownHostException {
 		mState = State.EATING;
 		System.out.println("IP: " + inetAddress.getHostAddress() + " is eating...!");
+		ackCount = 0;
 	}
 }
