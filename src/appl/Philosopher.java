@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -47,12 +48,17 @@ public class Philosopher {
 		feedCount = 0;
 		ackCount = 0;
 
-		new Philosopher("localhost", port++);
+
+		new Philosopher("localhost", port);
 	}
 
 	public Philosopher(String id, int port) throws IOException {
 		serverSocket = new ServerSocket(port);
-
+		try{
+			Thread.sleep(5000);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 //		this.id = id;
 		fifo = new LinkedBlockingQueue<String>();
 
@@ -164,7 +170,7 @@ public class Philosopher {
 
 	private void sendMessage(int type, String ip) throws UnknownHostException, IOException {
 		// Cria uma nova conexão com o vizinho
-		Socket neighboor = new Socket(ip, port++);
+		Socket neighboor = new Socket(ip, port);
 
 		PhilosopherMessage message = new PhilosopherMessage();
 		message.setType(type);
