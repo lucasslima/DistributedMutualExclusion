@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
+
 import utils.PhilosopherMessage;
 
 public class Philosopher {
@@ -174,7 +176,8 @@ public class Philosopher {
 
 		PhilosopherMessage message = new PhilosopherMessage();
 		message.setType(type);
-
+		if (type == PhilosopherMessage.REQUEST)
+			mTime = new Timestamp(System.currentTimeMillis());
 		// Escreve o objeto a ser enviado e fecha a conexão
 		ObjectOutputStream out = new ObjectOutputStream(neighboor.getOutputStream());
 		out.writeObject(message);
