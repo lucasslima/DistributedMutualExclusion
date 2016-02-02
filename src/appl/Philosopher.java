@@ -76,7 +76,7 @@ public class Philosopher {
 			}
 			while (true) {
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
-				Thread.sleep((long) Math.random() % 1000);
+				Thread.sleep((long) Math.random() % 5000);
 				mState = State.HUNGRY;
 				mTime = new Timestamp(System.currentTimeMillis());
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is hungry...!");
