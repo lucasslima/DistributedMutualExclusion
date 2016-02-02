@@ -176,7 +176,7 @@ public class Philosopher {
 
 		PhilosopherMessage message = new PhilosopherMessage();
 		message.setType(type);
-		message.setId(ip);
+		message.setId(neighboor.getLocalAddress().getHostAddress());
 		if (type == PhilosopherMessage.REQUEST)
 			mTime = new Timestamp(System.currentTimeMillis());
 		
