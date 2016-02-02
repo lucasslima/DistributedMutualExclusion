@@ -19,7 +19,7 @@ public class IpSender {
 	private  String ip;
 	
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException{
-		IpSender ipSender = new IpSender("192.168.0.112");
+		IpSender ipSender = new IpSender("192.168.0.117");
 		boolean firstTime = false;
 		
 		if(firstTime)

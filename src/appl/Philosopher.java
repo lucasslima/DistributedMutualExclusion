@@ -26,14 +26,13 @@ public class Philosopher {
 	}
 
 	State mState;
-	private String id;
 	private Timestamp mTime;
 	private Queue<String> fifo;
 	private static int ackCount;
-	private static IpSender sender;
 	private static ArrayList<String> neighboors;
 	private static ServerSocket serverSocket;
 	private final InetAddress inetAddress = InetAddress.getLocalHost();
+	private static int port = 6969;
 
 	/**
 	 * @param args
@@ -48,13 +47,13 @@ public class Philosopher {
 		feedCount = 0;
 		ackCount = 0;
 
-		new Philosopher("localhost", 6969);
+		new Philosopher("localhost", port++);
 	}
 
 	public Philosopher(String id, int port) throws IOException {
 		serverSocket = new ServerSocket(port);
 
-		this.id = id;
+//		this.id = id;
 		fifo = new LinkedBlockingQueue<String>();
 
 		try {
@@ -158,13 +157,14 @@ public class Philosopher {
 
 		String line = null;
 
-		while ((line = bufferedReader.readLine()) != null)
+		while ((line = bufferedReader.readLine()) != null){
 			neighboors.add(line);
+		}
 	}
 
 	private void sendMessage(int type, String ip) throws UnknownHostException, IOException {
 		// Cria uma nova conexão com o vizinho
-		Socket neighboor = new Socket(ip, 6970);
+		Socket neighboor = new Socket(ip, port++);
 
 		PhilosopherMessage message = new PhilosopherMessage();
 		message.setType(type);
