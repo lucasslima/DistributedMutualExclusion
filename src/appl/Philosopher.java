@@ -59,7 +59,7 @@ public class Philosopher {
 		
 //		this.id = id;
 		fifo = new LinkedBlockingQueue<String>();
-
+		mState = State.THINKING;
 		try {
 			// Cria uma thread para o servidor que ficará escutando outros
 			// filosofos
@@ -75,7 +75,6 @@ public class Philosopher {
 				e.printStackTrace();
 			}
 			while (true) {
-				mState = State.THINKING;
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
 				Thread.sleep((long) Math.random() % 1000);
 				mState = State.HUNGRY;
