@@ -142,9 +142,12 @@ public class Philosopher {
 								sendMessage(PhilosopherMessage.ACK, message.getId());
 							}
 						}
-						else
+						else{
 							if (mState == State.THINKING)
 								sendMessage(PhilosopherMessage.ACK,message.getId());
+							else
+								fifo.add(message.getId());
+						}
 						break;
 					default:
 						break;
