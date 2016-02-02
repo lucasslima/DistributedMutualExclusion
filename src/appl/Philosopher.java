@@ -75,6 +75,7 @@ public class Philosopher {
 				e.printStackTrace();
 			}
 			while (true) {
+				mState = State.THINKING;
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
 				Thread.sleep((long) Math.random() % 5000);
 				mState = State.HUNGRY;
@@ -112,7 +113,7 @@ public class Philosopher {
 					// PhilosopherMessage
 					PhilosopherMessage message = (PhilosopherMessage) in.readObject();
 					
-					System.out.println("Recebendo mensagem do ip: " + message.getId());
+					System.out.println("Recebendo mensagem " + message.getType() + " do ip: " + message.getId());
 
 					switch (message.getType()) {
 					// Ack significa que um release é recebido
@@ -178,6 +179,7 @@ public class Philosopher {
 
 	private void sendMessage(int type, String ip) throws UnknownHostException, IOException {
 		// Cria uma nova conexão com o vizinho
+		System.out.print("Sending " + type + "to" + ip);
 		try{
 			Socket neighboor = new Socket(ip, port);
 	
