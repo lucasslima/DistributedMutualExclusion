@@ -129,7 +129,10 @@ public class Philosopher {
 						// são recebidos este filosofo pode comer
 						if (ackCount == 2) {
 							// TODO Wake main thread
-							this.notify();
+							synchronized(this){
+								mState = State.EATING;
+								this.notify();
+							}
 						}
 						break;
 					// Request significa que algum filosofo está pedindo para
@@ -162,6 +165,8 @@ public class Philosopher {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				clientSocket.close();
+				in.close();
 			} catch (IOException e) {
 
 				System.out.println("Server Stopped.");
@@ -212,7 +217,6 @@ public class Philosopher {
 	}
 
 	private void eat() throws UnknownHostException {
-		mState = State.EATING;
 		System.out.println("IP: " + inetAddress.getHostAddress() + " is eating...!");
 		synchronized (this) {
 			ackCount = 0;
