@@ -12,7 +12,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
-import server.ControllerMessage;
+import utils.ControllerMessage;
 
 public class IpSender {
 	private  Socket s;

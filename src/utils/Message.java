@@ -1,7 +1,7 @@
 /**
  * 
  */
-package server;
+package utils;
 
 import java.io.Serializable;
 

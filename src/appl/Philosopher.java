@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import server.GenericConsumer;
-import server.GenericResource;
-import server.PhilosopherMessage;
-import server.Server;
+import utils.PhilosopherMessage;
 
 public class Philosopher {
 	// struct with stats of philosophers
@@ -30,7 +27,6 @@ public class Philosopher {
 
 	State mState;
 	private String id;
-	private SocketConsumer<Socket> mConsumer;
 	private Timestamp mTime;
 	private Queue<String> fifo;
 	private static int ackCount;

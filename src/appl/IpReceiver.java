@@ -8,7 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import server.ControllerMessage;
+import utils.ControllerMessage;
 
 public class IpReceiver {
 	private static ArrayList<String> allHosts;

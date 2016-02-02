@@ -1,4 +1,4 @@
-package server;
+package utils;
 
 @SuppressWarnings("serial")
 public class ControllerMessage implements Message {
