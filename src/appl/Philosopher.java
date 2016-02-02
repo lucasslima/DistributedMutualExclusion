@@ -111,6 +111,8 @@ public class Philosopher {
 					// Converte a mensagem recebida para o tipo
 					// PhilosopherMessage
 					PhilosopherMessage message = (PhilosopherMessage) in.readObject();
+					
+					System.out.println("Recebendo mensagem do ip: " + message.getId());
 
 					switch (message.getType()) {
 					// Ack significa que um release é recebido
