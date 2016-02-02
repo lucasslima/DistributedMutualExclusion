@@ -3,16 +3,12 @@ package server;
 import java.sql.Timestamp;
 
 public class PhilosopherMessage implements Message{
-
-	/**
-	 * 
-	 */
 	public final static int ACK = 0;
 	public final static int REQUEST = 1;
 	private static final long serialVersionUID = -1298874117877687170L;
 	private int type;
 	private Timestamp mTimestamp;
-	private int id;
+	private String id;
 	public PhilosopherMessage(){
 		setTimestamp(new Timestamp(System.currentTimeMillis()));
 	}
@@ -36,11 +32,11 @@ public class PhilosopherMessage implements Message{
 		this.mTimestamp = mTimestamp;
 	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
