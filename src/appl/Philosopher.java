@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,26 +15,22 @@ import java.util.ArrayList;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
-
 import utils.PhilosopherMessage;
 
 public class Philosopher {
 	// struct with stats of philosophers
-	private static int feedCount;
-
 	enum State {
 		THINKING, HUNGRY, EATING
 	}
 
-	State mState;
-	private Timestamp mTime;
-	private Queue<String> fifo;
-	private static int ackCount;
-	private static ArrayList<String> neighboors;
-	private static ServerSocket serverSocket;
-	private final InetAddress inetAddress = InetAddress.getLocalHost();
-	private static int port = 6969;
+	private State 						mState;
+	private Timestamp 					mTime;
+	private Queue<String> 				fifo;
+	private static int 					ackCount;
+	private static ArrayList<String> 	neighboors;
+	private static ServerSocket 		serverSocket;
+	private final InetAddress 			inetAddress = InetAddress.getLocalHost();
+	private static int 					port = 6969;
 
 	/**
 	 * @param args
@@ -47,19 +42,16 @@ public class Philosopher {
 		neighboors = new ArrayList<String>();
 		getNeighboors();
 
-		feedCount = 0;
 		ackCount = 0;
 
-
-		new Philosopher("localhost", port);
+		new Philosopher(port);
 	}
 
-	public Philosopher(String id, int port) throws IOException {
-		serverSocket = new ServerSocket(port);
+	public Philosopher(int port) throws IOException {
+		serverSocket 	= new ServerSocket(port);
+		fifo 			= new LinkedBlockingQueue<String>();
+		mState 			= State.THINKING;
 		
-//		this.id = id;
-		fifo = new LinkedBlockingQueue<String>();
-		mState = State.THINKING;
 		try {
 			// Cria uma thread para o servidor que ficará escutando outros
 			// filosofos
@@ -69,11 +61,13 @@ public class Philosopher {
 					listen();
 				}
 			}.start();
+			
 			try{
 				Thread.sleep(5000);
 			}catch(Exception e){
 				e.printStackTrace();
 			}
+			
 			while (true) {
 				mState = State.THINKING;
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
@@ -91,8 +85,9 @@ public class Philosopher {
 					synchronized (this) {
 						this.wait();
 					}
+				}else{
+					eat();
 				}
-				eat();
 
 //				while (!fifo.isEmpty()) {
 //					sendMessage(PhilosopherMessage.ACK, fifo.poll());
@@ -109,9 +104,9 @@ public class Philosopher {
 	private void listen() {
 		while (true) {
 			try {
-				// Cria um socket para o cliente que está enviando uma
-				// requisição
+				// Cria um socket para o cliente que está enviando uma requisição
 				Socket clientSocket = this.serverSocket.accept();
+			
 				// Cria um objeto para receber uma requisição
 				ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
 				try {
@@ -137,6 +132,7 @@ public class Philosopher {
 							}
 						}
 						break;
+						
 					// Request significa que algum filosofo está pedindo para
 					// comer
 					case PhilosopherMessage.REQUEST:
@@ -200,8 +196,10 @@ public class Philosopher {
 			PhilosopherMessage message = new PhilosopherMessage();
 			message.setType(type);
 			message.setId(neighboor.getLocalAddress().getHostAddress());
-			if (type == PhilosopherMessage.REQUEST)
+			if (type == PhilosopherMessage.REQUEST){
 				mTime = new Timestamp(System.currentTimeMillis());
+				message.setTimestamp(mTime);
+			}
 			
 			// Escreve o objeto a ser enviado e fecha a conexão
 			ObjectOutputStream out = new ObjectOutputStream(neighboor.getOutputStream());
@@ -218,8 +216,9 @@ public class Philosopher {
 		}
 	}
 
-	private void eat() throws UnknownHostException {
+	private void eat() throws UnknownHostException, InterruptedException {
 		System.out.println("IP: " + inetAddress.getHostAddress() + " is eating...!");
+		Thread.sleep(3000);
 		synchronized (this) {
 			ackCount = 0;
 		}
