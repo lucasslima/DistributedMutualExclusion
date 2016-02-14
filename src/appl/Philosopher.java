@@ -32,12 +32,6 @@ public class Philosopher {
 	private final InetAddress 			inetAddress = InetAddress.getLocalHost();
 	private static int 					port = 6969;
 
-	/**
-	 * @param args
-	 * @throws IOException
-	 * @throws UnknownHostException
-	 * @throws ClassNotFoundException
-	 */
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
 		neighboors = new ArrayList<String>();
 		getNeighboors();
@@ -73,7 +67,6 @@ public class Philosopher {
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
 				Thread.sleep((long) Math.random() % 5000);
 				mState = State.HUNGRY;
-				mTime = new Timestamp(System.currentTimeMillis());
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is hungry...!");
 				
 				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
@@ -85,15 +78,14 @@ public class Philosopher {
 					synchronized (this) {
 						this.wait();
 					}
-				}else{
-					eat();
 				}
-
-//				while (!fifo.isEmpty()) {
-//					sendMessage(PhilosopherMessage.ACK, fifo.poll());
-//				}
-				sendMessage(PhilosopherMessage.ACK, neighboors.get(0));
-				sendMessage(PhilosopherMessage.ACK, neighboors.get(1));
+				
+				mState = State.EATING;
+				eat();
+				while (!fifo.isEmpty()) {
+					sendMessage(PhilosopherMessage.ACK, fifo.poll());
+				}
+				
 			}
 		} catch (Exception e) {
 			// TODO Handle no philosopher on left or right
@@ -125,9 +117,7 @@ public class Philosopher {
 						// Se dois acks(do filosofo da direita e da esquerda)
 						// são recebidos este filosofo pode comer
 						if (ackCount == 2) {
-							// TODO Wake main thread
 							synchronized(this){
-								mState = State.EATING;
 								this.notify();
 							}
 						}
@@ -189,7 +179,6 @@ public class Philosopher {
 
 	private void sendMessage(int type, String ip) throws UnknownHostException, IOException {
 		// Cria uma nova conexão com o vizinho
-		System.out.println("Sending " + type + " to " + ip);
 		try{
 			Socket neighboor = new Socket(ip, port);
 	
