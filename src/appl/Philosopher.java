@@ -26,6 +26,7 @@ public class Philosopher {
 	private State 						mState;
 	private Timestamp 					mTime;
 	private Queue<String> 				fifo;
+	private Queue<Philosophers>			philosophers;				
 	private static int 					ackCount;
 	private static ArrayList<String> 	neighboors;
 	private static ServerSocket 		serverSocket;
@@ -45,6 +46,7 @@ public class Philosopher {
 		serverSocket 	= new ServerSocket(port);
 		fifo 			= new LinkedBlockingQueue<String>();
 		mState 			= State.THINKING;
+		mTime 			= new Timestamp(System.currentTimeMillis());
 		
 		try {
 			// Cria uma thread para o servidor que ficará escutando outros
@@ -65,7 +67,7 @@ public class Philosopher {
 			while (true) {
 				mState = State.THINKING;
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
-				Thread.sleep((long) Math.random() % 5000);
+				Thread.sleep(1500);
 				mState = State.HUNGRY;
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is hungry...!");
 				
@@ -82,6 +84,7 @@ public class Philosopher {
 				
 				mState = State.EATING;
 				eat();
+				
 				while (!fifo.isEmpty()) {
 					sendMessage(PhilosopherMessage.ACK, fifo.poll());
 				}
@@ -207,7 +210,6 @@ public class Philosopher {
 
 	private void eat() throws UnknownHostException, InterruptedException {
 		System.out.println("IP: " + inetAddress.getHostAddress() + " is eating...!");
-		Thread.sleep(3000);
 		synchronized (this) {
 			ackCount = 0;
 		}
