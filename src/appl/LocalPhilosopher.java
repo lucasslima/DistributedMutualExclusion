@@ -26,12 +26,12 @@ public class LocalPhilosopher {
 	private State 						mState;
 	private Timestamp 					mTime;
 	private Queue<String> 				fifo;
-	private static int 					ackCount;
-	private static ArrayList<String> 	neighboors;
-	private static ServerSocket 		serverSocket;
-	private static String 				id; 
+	private int 						ackCount;
+	private ArrayList<String> 			neighboors;
+	private ServerSocket 				serverSocket;
+	private String 						id; 
 
-	public LocalPhilosopher(String port, String turn,ArrayList<String> neighboors) throws IOException {
+	public LocalPhilosopher(String port,ArrayList<String> neighboors) throws IOException {
 		this.neighboors	= neighboors;
 		id				= port;
 		ackCount 		= 0;
@@ -67,8 +67,6 @@ public class LocalPhilosopher {
 				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
 				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
 				
-				//espera por dois acks 
-				//while (ackCount < 2);
 				if (ackCount < 2){
 					synchronized (this) {
 						this.wait();
@@ -77,10 +75,11 @@ public class LocalPhilosopher {
 				
 				mState = State.EATING;
 				synchronized (this) {
-					turn = port;
+					sendMessage(2, "6969");
 					wait();
+					ackCount = 0;
 				}
-				
+								
 				while (!fifo.isEmpty()) {
 					sendMessage(PhilosopherMessage.ACK, fifo.poll());
 				}
@@ -105,7 +104,8 @@ public class LocalPhilosopher {
 					// PhilosopherMessage
 					PhilosopherMessage message = (PhilosopherMessage) in.readObject();
 					
-
+//					System.out.println(id +" recebendo " + message.getType() + " da porta: " + message.getId());
+			
 					switch (message.getType()) {
 					// Ack significa que um release é recebido
 					case PhilosopherMessage.ACK:
@@ -145,6 +145,11 @@ public class LocalPhilosopher {
 								fifo.add(message.getId());
 						}
 						break;
+					case PhilosopherMessage.WAKEUP:
+						synchronized (this) {
+							this.notify();
+						}
+						break;
 					default:
 						break;
 					}
@@ -173,6 +178,8 @@ public class LocalPhilosopher {
 			if (type == PhilosopherMessage.REQUEST){
 				message.setTimestamp(mTime);
 			}
+			
+//			System.out.println(id +" mandando " + message.getType() + " à porta: " + port + " com timestamp: " + message.getTimestamp());
 			
 			// Escreve o objeto a ser enviado e fecha a conexão
 			ObjectOutputStream out = new ObjectOutputStream(neighboor.getOutputStream());
