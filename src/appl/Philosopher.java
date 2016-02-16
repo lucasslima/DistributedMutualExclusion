@@ -179,7 +179,7 @@ public class Philosopher{
 					else 
 						typeRequest = "request";
 					
-					System.out.println("Recebendo " + typeRequest + " do ip: " + message.getId());
+//					System.out.println("Recebendo " + typeRequest + " do ip: " + message.getId());
 
 					switch (message.getType()) {
 					// Ack significa que um release é recebido
