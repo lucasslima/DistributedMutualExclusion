@@ -12,15 +12,10 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import com.sun.swing.internal.plaf.synth.resources.synth;
 
 import utils.PhilosopherMessage;
 import appl.LocalPhilosopher;
