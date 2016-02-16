@@ -12,10 +12,13 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import utils.PhilosopherMessage;
+import appl.Philosophers;
 
 public class Philosopher {
 	// struct with stats of philosophers
@@ -26,12 +29,13 @@ public class Philosopher {
 	private State 						mState;
 	private Timestamp 					mTime;
 	private Queue<String> 				fifo;
-	private Queue<Philosophers>			philosophers;				
+	private Philosophers []				philosophers;				
 	private static int 					ackCount;
 	private static ArrayList<String> 	neighboors;
 	private static ServerSocket 		serverSocket;
 	private final InetAddress 			inetAddress = InetAddress.getLocalHost();
 	private static int 					port = 6969;
+	private final int 					numPhilosophers = 5;
 
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
 		neighboors = new ArrayList<String>();
@@ -45,8 +49,12 @@ public class Philosopher {
 	public Philosopher(int port) throws IOException {
 		serverSocket 	= new ServerSocket(port);
 		fifo 			= new LinkedBlockingQueue<String>();
+		philosophers	= new Philosophers[numPhilosophers]; 
 		mState 			= State.THINKING;
 		mTime 			= new Timestamp(System.currentTimeMillis());
+		
+		for(int i = 0 ; i < numPhilosophers; i++){
+		}
 		
 		try {
 			// Cria uma thread para o servidor que ficará escutando outros
@@ -71,6 +79,7 @@ public class Philosopher {
 				mState = State.HUNGRY;
 				System.out.println("IP: " + inetAddress.getHostAddress() + " is hungry...!");
 				
+				mTime = new Timestamp(System.currentTimeMillis());
 				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
 				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
 				
@@ -189,7 +198,6 @@ public class Philosopher {
 			message.setType(type);
 			message.setId(neighboor.getLocalAddress().getHostAddress());
 			if (type == PhilosopherMessage.REQUEST){
-				mTime = new Timestamp(System.currentTimeMillis());
 				message.setTimestamp(mTime);
 			}
 			

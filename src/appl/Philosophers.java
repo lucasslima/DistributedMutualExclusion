@@ -5,6 +5,8 @@ public class Philosophers {
 		THINKING, HUNGRY, EATING
 	}
 	
+	public static State mState; 
+	
 	private int id;
 
 	public int getId() {
