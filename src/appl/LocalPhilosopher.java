@@ -33,6 +33,7 @@ public class LocalPhilosopher {
 	private static int 					id;
 
 	public LocalPhilosopher(String port, Integer turn,ArrayList<String> neighboors) throws IOException {
+		System.out.println("Creating local philosopher");
 		this.neighboors	= neighboors;
 		this.id			= id;
 		ackCount 		= 0;

@@ -38,7 +38,7 @@ public class Philosopher {
 	private final InetAddress 			inetAddress = InetAddress.getLocalHost();
 	private static int 					port = 6969;
 	private final int 					numPhilosophers = 3;
-	private Integer 					turn;
+	private static Integer 				turn;
 	private Map<String,Thread> 			philosophers;
 
 
@@ -47,6 +47,7 @@ public class Philosopher {
 		getNeighboors();
 
 		ackCount = 0;
+		turn = 0;
 
 		new Philosopher(port);
 	}
@@ -91,6 +92,12 @@ public class Philosopher {
 			}catch(Exception e){
 				e.printStackTrace();
 			}
+		}
+		
+		try{
+			Thread.sleep(2500);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 		
 		try {
