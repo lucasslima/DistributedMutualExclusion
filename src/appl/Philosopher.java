@@ -14,11 +14,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import utils.PhilosopherMessage;
-import appl.Philosophers;
+import appl.LocalPhilosopher;
 
 public class Philosopher {
 	// struct with stats of philosophers
@@ -29,13 +32,15 @@ public class Philosopher {
 	private State 						mState;
 	private Timestamp 					mTime;
 	private Queue<String> 				fifo;
-	private Philosophers []				philosophers;				
 	private static int 					ackCount;
 	private static ArrayList<String> 	neighboors;
 	private static ServerSocket 		serverSocket;
 	private final InetAddress 			inetAddress = InetAddress.getLocalHost();
 	private static int 					port = 6969;
-	private final int 					numPhilosophers = 5;
+	private final int 					numPhilosophers = 3;
+	private Integer 					turn;
+	private Map<String,Thread> 			philosophers;
+
 
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
 		neighboors = new ArrayList<String>();
@@ -47,13 +52,45 @@ public class Philosopher {
 	}
 
 	public Philosopher(int port) throws IOException {
+		philosophers	= (Map<String, Thread>) new TreeMap<String,Thread>();
 		serverSocket 	= new ServerSocket(port);
 		fifo 			= new LinkedBlockingQueue<String>();
-		philosophers	= new Philosophers[numPhilosophers]; 
 		mState 			= State.THINKING;
 		mTime 			= new Timestamp(System.currentTimeMillis());
-		
-		for(int i = 0 ; i < numPhilosophers; i++){
+		ArrayList<String> ports = new ArrayList<String>();
+		ports.add("6970");
+		ports.add("6971");
+		ports.add("6972");
+	
+		for(int i = 0; i < numPhilosophers; i++){
+			final int index = i;
+			try{
+				philosophers.put(ports.get(i), new Thread() {
+					@Override
+					public void run() {
+						ArrayList<String> aux = new ArrayList<String>();
+						if(index == 0){
+							aux.add(ports.get(numPhilosophers-1));
+							aux.add(ports.get(index+1));
+						}else if(index == numPhilosophers - 1){
+							aux.add(ports.get(index-1));
+							aux.add(ports.get(0));
+						}else{
+							aux.add(ports.get(index-1));
+							aux.add(ports.get(index+1));
+						}
+						
+						try {
+							new LocalPhilosopher(ports.get(index), turn, aux);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				philosophers.get(ports.get(i)).start();
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 		
 		try {
@@ -74,10 +111,10 @@ public class Philosopher {
 			
 			while (true) {
 				mState = State.THINKING;
-				System.out.println("IP: " + inetAddress.getHostAddress() + " is thinking...!");
+				System.out.println("Philosopher of port:  " + turn + " is thinking...!");
 				Thread.sleep(1500);
 				mState = State.HUNGRY;
-				System.out.println("IP: " + inetAddress.getHostAddress() + " is hungry...!");
+				System.out.println("Philosopher of port:  " + turn + " is hungry...!");
 				
 				mTime = new Timestamp(System.currentTimeMillis());
 				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
@@ -93,6 +130,8 @@ public class Philosopher {
 				
 				mState = State.EATING;
 				eat();
+				
+				philosophers.get(turn).notify();
 				
 				while (!fifo.isEmpty()) {
 					sendMessage(PhilosopherMessage.ACK, fifo.poll());
@@ -118,7 +157,13 @@ public class Philosopher {
 					// PhilosopherMessage
 					PhilosopherMessage message = (PhilosopherMessage) in.readObject();
 					
-					System.out.println("Recebendo mensagem " + message.getType() + " do ip: " + message.getId());
+					String typeRequest = null; 
+					if(message.getType() == 0)
+						typeRequest = "ack";
+					else 
+						typeRequest = "request";
+					
+					System.out.println("Recebendo " + typeRequest + " do ip: " + message.getId());
 
 					switch (message.getType()) {
 					// Ack significa que um release é recebido
@@ -217,7 +262,7 @@ public class Philosopher {
 	}
 
 	private void eat() throws UnknownHostException, InterruptedException {
-		System.out.println("IP: " + inetAddress.getHostAddress() + " is eating...!");
+		System.out.println("Philosopher of port:  " + turn + " is eating...!");
 		synchronized (this) {
 			ackCount = 0;
 		}
