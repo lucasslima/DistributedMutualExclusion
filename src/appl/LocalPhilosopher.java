@@ -29,13 +29,11 @@ public class LocalPhilosopher {
 	private static int 					ackCount;
 	private static ArrayList<String> 	neighboors;
 	private static ServerSocket 		serverSocket;
-	private final InetAddress 			inetAddress = InetAddress.getLocalHost();
-	private static int 					id;
+	private static String 				id; 
 
-	public LocalPhilosopher(String port, Integer turn,ArrayList<String> neighboors) throws IOException {
-		System.out.println("Creating local philosopher");
+	public LocalPhilosopher(String port, String turn,ArrayList<String> neighboors) throws IOException {
 		this.neighboors	= neighboors;
-		this.id			= id;
+		id				= port;
 		ackCount 		= 0;
 		serverSocket 	= new ServerSocket(Integer.parseInt(port));
 		fifo 			= new LinkedBlockingQueue<String>();
@@ -79,7 +77,7 @@ public class LocalPhilosopher {
 				
 				mState = State.EATING;
 				synchronized (this) {
-					turn = id;
+					turn = port;
 					wait();
 				}
 				
@@ -171,7 +169,7 @@ public class LocalPhilosopher {
 	
 			PhilosopherMessage message = new PhilosopherMessage();
 			message.setType(type);
-			message.setId(neighboor.getLocalAddress().getHostAddress());
+			message.setId(id);
 			if (type == PhilosopherMessage.REQUEST){
 				message.setTimestamp(mTime);
 			}
