@@ -38,8 +38,9 @@ public class Philosopher{
 	private Map<String,Thread> 			philosophers;
 	private static Philosopher			philosopher;
 	public static String				turn; 
-	private final int 					ITERATIONS = 15;
 	private static int 					numMessagesSent;
+	private static boolean 				alowedToEat = true;
+	private long 						time;
 
 
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
@@ -101,7 +102,7 @@ public class Philosopher{
 				e.printStackTrace();
 			}
 		}
-		
+				
 		try {
 			// Cria uma thread para o servidor que ficará escutando outros
 			// filosofos
@@ -118,16 +119,17 @@ public class Philosopher{
 				e.printStackTrace();
 			}
 			
-			int count = 0;
-			while (true) {
-				if(count++ < ITERATIONS){
+			time = System.nanoTime();
+			while (alowedToEat) {
+				long currenTime = System.nanoTime();
+				if((currenTime - time)/1000000000 < 30){
 					synchronized (this) {
 						wait();
 					}
 					mState = State.THINKING;
 					System.out.println();
 					System.err.println("Philosopher of port:  " + turn + " is thinking...!");
-					Thread.sleep(1500);
+					Thread.sleep(1500); 
 					mState = State.HUNGRY;
 					System.err.println("Philosopher of port:  " + turn + " is hungry...!");
 					
@@ -159,7 +161,7 @@ public class Philosopher{
 					for(String aux : ports){
 						sendMessage(PhilosopherMessage.PRINT,"localhost", Integer.parseInt(aux));
 					}
-					System.exit(0);
+					alowedToEat = false;
 				}
 			}
 		} catch (Exception e) {
