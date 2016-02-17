@@ -38,6 +38,8 @@ public class Philosopher{
 	private Map<String,Thread> 			philosophers;
 	private static Philosopher			philosopher;
 	public static String				turn; 
+	private final int 					ITERATIONS = 100;
+	private int 						numMessagesSent = 0;
 
 
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
@@ -115,39 +117,44 @@ public class Philosopher{
 				e.printStackTrace();
 			}
 			
+			int count = 0;
 			while (true) {
-				synchronized (this) {
-					wait();
-				}
-				mState = State.THINKING;
-				System.err.println("Philosopher of port:  " + turn + " is thinking...!");
-				Thread.sleep(1500);
-				mState = State.HUNGRY;
-				System.err.println("Philosopher of port:  " + turn + " is hungry...!");
-				
-				mTime = new Timestamp(System.currentTimeMillis());
-				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
-				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
-				
-				//espera por dois acks 
-				//while (ackCount < 2);
-				if (ackCount < 2){
+				if(count++ < ITERATIONS){
 					synchronized (this) {
-						this.wait();
+						wait();
 					}
+					mState = State.THINKING;
+					System.err.println("Philosopher of port:  " + turn + " is thinking...!");
+					Thread.sleep(1500);
+					mState = State.HUNGRY;
+					System.err.println("Philosopher of port:  " + turn + " is hungry...!");
+					
+					mTime = new Timestamp(System.currentTimeMillis());
+					sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
+					sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
+					
+					//espera por dois acks 
+					//while (ackCount < 2);
+					if (ackCount < 2){
+						synchronized (this) {
+							this.wait();
+						}
+					}
+					
+					mState = State.EATING;
+					eat();
+					
+					while (!fifo.isEmpty()) {
+						sendMessage(PhilosopherMessage.ACK, fifo.poll());
+					}
+					
+					sendMessage(2,"localhost", Integer.parseInt(turn));
+					turn = "null";
+					
+					mState = State.THINKING;
+				}else{
+					System.out.println("Num of messages sent: " + numMessagesSent);
 				}
-				
-				mState = State.EATING;
-				eat();
-				
-				while (!fifo.isEmpty()) {
-					sendMessage(PhilosopherMessage.ACK, fifo.poll());
-				}
-				
-				sendMessage(2,"localhost", Integer.parseInt(turn));
-				turn = "null";
-				
-				mState = State.THINKING;
 			}
 		} catch (Exception e) {
 			// TODO Handle no philosopher on left or right

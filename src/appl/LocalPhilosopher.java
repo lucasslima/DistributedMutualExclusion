@@ -30,6 +30,9 @@ public class LocalPhilosopher {
 	private ArrayList<String> 			neighboors;
 	private ServerSocket 				serverSocket;
 	private String 						id; 
+	private final int 					ITERATIONS = 100;
+	private int 						numMessagesSent = 0;
+	private int 						eatCount = 0; 
 
 	public LocalPhilosopher(String port,ArrayList<String> neighboors) throws IOException {
 		this.neighboors	= neighboors;
@@ -58,32 +61,39 @@ public class LocalPhilosopher {
 				e.printStackTrace();
 			}
 			
+			int count = 0;
 			while (true) {
-				mState = State.THINKING;
-				Thread.sleep(1500);
-				mState = State.HUNGRY;
-				
-				mTime = new Timestamp(System.currentTimeMillis());
-				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
-				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
-				
-				if (ackCount < 2){
+				if(count++ < ITERATIONS){
+					mState = State.THINKING;
+					Thread.sleep(1500);
+					mState = State.HUNGRY;
+					
+					mTime = new Timestamp(System.currentTimeMillis());
+					sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
+					sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
+					
+					if (ackCount < 2){
+						synchronized (this) {
+							this.wait();
+						}
+					}
+					
+					mState = State.EATING;
+					eatCount++; 
 					synchronized (this) {
-						this.wait();
+						sendMessage(2, "6969");
+						wait();
+						ackCount = 0;
+					}
+									
+					while (!fifo.isEmpty()) {
+						sendMessage(PhilosopherMessage.ACK, fifo.poll());
 					}
 				}
-				
-				mState = State.EATING;
-				synchronized (this) {
-					sendMessage(2, "6969");
-					wait();
-					ackCount = 0;
+				else{
+					System.out.println("Num times " + id + " ate: " + eatCount);
+					System.out.println("Num messages sent " + numMessagesSent);
 				}
-								
-				while (!fifo.isEmpty()) {
-					sendMessage(PhilosopherMessage.ACK, fifo.poll());
-				}
-				
 			}
 		} catch (Exception e) {
 			// TODO Handle no philosopher on left or right
@@ -179,8 +189,8 @@ public class LocalPhilosopher {
 				message.setTimestamp(mTime);
 			}
 			
-//			System.out.println(id +" mandando " + message.getType() + " à porta: " + port + " com timestamp: " + message.getTimestamp());
-			
+			numMessagesSent++;
+				
 			// Escreve o objeto a ser enviado e fecha a conexão
 			ObjectOutputStream out = new ObjectOutputStream(neighboor.getOutputStream());
 			out.writeObject(message);
