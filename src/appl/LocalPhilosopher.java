@@ -92,7 +92,8 @@ public class LocalPhilosopher {
 				}
 				else{
 					System.out.println("Num times " + id + " ate: " + eatCount);
-					System.out.println("Num messages sent " + numMessagesSent);
+					System.out.println("Num messages sent " + numMessagesSent + " in local philosopher");
+					System.exit(0);
 				}
 			}
 		} catch (Exception e) {

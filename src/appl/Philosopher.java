@@ -306,6 +306,7 @@ public class Philosopher{
 			out.close();
 	
 			neighboor.close();
+			numMessagesSent++;
 		}
 		catch (Exception e){
 			synchronized (this) {
