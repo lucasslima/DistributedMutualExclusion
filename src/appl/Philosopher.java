@@ -38,8 +38,8 @@ public class Philosopher{
 	private Map<String,Thread> 			philosophers;
 	private static Philosopher			philosopher;
 	public static String				turn; 
-	private final int 					ITERATIONS = 100;
-	private int 						numMessagesSent = 0;
+	private final int 					ITERATIONS = 15;
+	private static int 					numMessagesSent;
 
 
 	public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
@@ -47,6 +47,7 @@ public class Philosopher{
 		getNeighboors();
 
 		ackCount = 0;
+		numMessagesSent = 0;
 
 		getInstance();
 	}
@@ -154,10 +155,11 @@ public class Philosopher{
 					mState = State.THINKING;
 				}else{
 					System.out.println("Num of messages sent: " + numMessagesSent);
+					System.exit(0);
 				}
 			}
 		} catch (Exception e) {
-			// TODO Handle no philosopher on left or right
+			System.out.println("There is no neighboor on left or right");
 			e.printStackTrace();
 		}
 	}
@@ -181,7 +183,7 @@ public class Philosopher{
 					else 
 						typeRequest = "request";
 					
-//					System.out.println("Recebendo " + typeRequest + " do ip: " + message.getId());
+					System.out.println("Recebendo " + typeRequest + " do ip: " + message.getId());
 
 					switch (message.getType()) {
 					// Ack significa que um release é recebido
