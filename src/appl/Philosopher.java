@@ -125,6 +125,7 @@ public class Philosopher{
 						wait();
 					}
 					mState = State.THINKING;
+					System.out.println();
 					System.err.println("Philosopher of port:  " + turn + " is thinking...!");
 					Thread.sleep(1500);
 					mState = State.HUNGRY;
@@ -149,12 +150,15 @@ public class Philosopher{
 						sendMessage(PhilosopherMessage.ACK, fifo.poll());
 					}
 					
-					sendMessage(2,"localhost", Integer.parseInt(turn));
+					sendMessage(PhilosopherMessage.WAKEUP,"localhost", Integer.parseInt(turn));
 					turn = "null";
 					
 					mState = State.THINKING;
 				}else{
 					System.out.println("Num of messages sent: " + numMessagesSent);
+					for(String aux : ports){
+						sendMessage(PhilosopherMessage.PRINT,"localhost", Integer.parseInt(aux));
+					}
 					System.exit(0);
 				}
 			}
@@ -261,6 +265,7 @@ public class Philosopher{
 	}
 
 	private void sendMessage(int type, String ip) throws UnknownHostException, IOException {
+		numMessagesSent++;
 		// Cria uma nova conexão com o vizinho
 		try{
 			Socket neighboor = new Socket(ip, port);
@@ -288,6 +293,7 @@ public class Philosopher{
 	}
 	
 	private void sendMessage(int type, String ip,int port) throws UnknownHostException, IOException {
+		numMessagesSent++;
 		// Cria uma nova conexão com o vizinho
 		try{
 			Socket neighboor = new Socket(ip, port);
@@ -306,7 +312,6 @@ public class Philosopher{
 			out.close();
 	
 			neighboor.close();
-			numMessagesSent++;
 		}
 		catch (Exception e){
 			synchronized (this) {

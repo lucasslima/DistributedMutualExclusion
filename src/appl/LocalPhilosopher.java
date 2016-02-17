@@ -30,9 +30,9 @@ public class LocalPhilosopher {
 	private ArrayList<String> 			neighboors;
 	private ServerSocket 				serverSocket;
 	private String 						id; 
-	private final int 					ITERATIONS = 100;
-	private int 						numMessagesSent = 0;
+	private static int 					numMessagesSent = 0;
 	private int 						eatCount = 0; 
+	private boolean						allowedToEat = true; 
 
 	public LocalPhilosopher(String port,ArrayList<String> neighboors) throws IOException {
 		this.neighboors	= neighboors;
@@ -62,39 +62,33 @@ public class LocalPhilosopher {
 			}
 			
 			int count = 0;
-			while (true) {
-				if(count++ < ITERATIONS){
-					mState = State.THINKING;
-					Thread.sleep(1500);
-					mState = State.HUNGRY;
-					
-					mTime = new Timestamp(System.currentTimeMillis());
-					sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
-					sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
-					
-					if (ackCount < 2){
-						synchronized (this) {
-							this.wait();
-						}
-					}
-					
-					mState = State.EATING;
-					eatCount++; 
+			while (true && allowedToEat) {
+				mState = State.THINKING;
+				Thread.sleep(1500);
+				mState = State.HUNGRY;
+				
+				mTime = new Timestamp(System.currentTimeMillis());
+				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(0));
+				sendMessage(PhilosopherMessage.REQUEST, neighboors.get(1));
+				
+				if (ackCount < 2){
 					synchronized (this) {
-						sendMessage(2, "6969");
-						wait();
-						ackCount = 0;
-					}
-									
-					while (!fifo.isEmpty()) {
-						sendMessage(PhilosopherMessage.ACK, fifo.poll());
+						this.wait();
 					}
 				}
-				else{
-					System.out.println("Num times " + id + " ate: " + eatCount);
-					System.out.println("Num messages sent " + numMessagesSent + " in local philosopher");
-					System.exit(0);
+				
+				mState = State.EATING;
+				eatCount++; 
+				synchronized (this) {
+					sendMessage(2, "6969");
+					wait();
+					ackCount = 0;
 				}
+								
+				while (!fifo.isEmpty()) {
+					sendMessage(PhilosopherMessage.ACK, fifo.poll());
+				}
+				
 			}
 		} catch (Exception e) {
 			// TODO Handle no philosopher on left or right
@@ -161,6 +155,11 @@ public class LocalPhilosopher {
 							this.notify();
 						}
 						break;
+					case PhilosopherMessage.PRINT:
+						mState = State.THINKING;
+						allowedToEat = false;
+						System.out.println("Num times " + id + " ate: " + eatCount);
+						System.out.println("Num messages sent " + numMessagesSent + " in local philosopher");
 					default:
 						break;
 					}

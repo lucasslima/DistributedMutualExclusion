@@ -6,6 +6,7 @@ public class PhilosopherMessage implements Message{
 	public final static int ACK = 0;
 	public final static int REQUEST = 1;
 	public final static int WAKEUP = 2; 
+	public final static int PRINT = 3;
 	private static final long serialVersionUID = -1298874117877687170L;
 	private int type;
 	private Timestamp mTimestamp;
